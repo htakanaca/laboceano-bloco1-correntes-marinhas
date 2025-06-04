@@ -28,7 +28,7 @@
 % Dados de Correntes Marinhas na "superfície":
 % - Frequência amostral: 5 minutos.
 % - Período: 01/01/2020 às 00:00h a 31/12/2024 às 23:55h.
-% - Colunas: 1  2   3   4  5  6   7
+% - Colunas: 1  2   3   4  5  6   7   8
 % - Formato: DD,MM,YYYY,HH,MM,SS, Direção em graus (Norte geográfico - 0º),
 % Intensidade em nós.
 %
@@ -257,7 +257,7 @@ v_sup_adcp = v_sup_adcp - 100;
 u_sup_adcp_comtide = u_sup_adcp;
 v_sup_adcp_comtide = v_sup_adcp;
 
-nome_do_arquivo_outmat = 'nome_do_arquivo_outmat.mat'; % .mat
+nome_do_arquivo_outmat = 'nivel_adcp_comtide.mat'; % .mat
 save (nome_do_arquivo_outmat,'u_sup_adcp_comtide','v_sup_adcp_comtide');
 
 u_sup_adcp=dados(:,8).*sind(dados(:,7));
