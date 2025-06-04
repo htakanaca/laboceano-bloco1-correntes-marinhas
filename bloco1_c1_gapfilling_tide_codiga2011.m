@@ -28,7 +28,7 @@
 % Dados de Correntes Marinhas na "superfície":
 % - Frequência amostral: 5 minutos.
 % - Período: 01/01/2020 às 00:00h a 31/12/2024 às 23:55h.
-% - Colunas: 1  2   3   4  5  6   7   8
+% - Colunas: 1  2   3   4  5  6   7
 % - Formato: DD,MM,YYYY,HH,MM,SS, Direção em graus (Norte geográfico - 0º),
 % Intensidade em nós.
 %
@@ -56,10 +56,10 @@ clc
 
 % === CONFIGURAÇÃO DO USUÁRIO ===
 % Defina aqui o caminho para o diretório onde estão os dados
-data_dir = 'C:/Users/SEU_NOME/SEUS_DADOS/';
+data_dir = 'D:\Hatsue\Dados_sismo\Estacao_Guanabara_BH_Boia_07\Dados_brutos_do_site\';%'C:/Users/SEU_NOME/SEUS_DADOS/';
 
 % Define o nome do arquivo de dados:
-nomedoarquivo = 'nomedoarquivo.mat'; % .mat, .txt, etc
+nomedoarquivo = 'Estacao_Guanabara_BH_Boia_07_corr_6_5m.TXT';%'nomedoarquivo.mat'; % .mat, .txt, etc
 arquivo = fullfile(data_dir, nomedoarquivo);
 
 % Verifica se o arquivo existe antes de carregar
@@ -257,20 +257,26 @@ v_sup_adcp = v_sup_adcp - 100;
 u_sup_adcp_comtide = u_sup_adcp;
 v_sup_adcp_comtide = v_sup_adcp;
 
-nome_do_arquivo_outmat = 'corr_adcp_comtide.mat'; % .mat
+nome_do_arquivo_outmat = 'nome_do_arquivo_outmat.mat'; % .mat
 save (nome_do_arquivo_outmat,'u_sup_adcp_comtide','v_sup_adcp_comtide');
 
 u_sup_adcp=dados(:,8).*sind(dados(:,7));
 v_sup_adcp=dados(:,8).*cosd(dados(:,7));
 
+mag_sup_adcp_comtide= sqrt((u_sup_adcp_comtide.^2)+(v_sup_adcp_comtide.^2));
+
+direcao = atan2(v_sup_adcp_comtide,u_sup_adcp_comtide);
+dir_sup_adcp_comtide = rad2deg(mod((pi/2 - direcao), 2*pi));
+
 % Formato .csv:
 dados_preenchidos = dados(1:tamanho_tempo_total,1:6);
-dados_preenchidos(:,7) = nivel_adcp_comtide;
+dados_preenchidos(:,7) = dir_sup_adcp_comtide;
+dados_preenchidos(:,8) = mag_sup_adcp_comtide;
 
 % Sem cabeçalho:
 % dlmwrite('nivel_adcp_comtide.csv', dados_preenchidos, 'delimiter', ',', 'precision', 6);
 
-filename = 'nivel_adcp_comtide.csv';
+filename = 'corr_adcp_comtide.csv';
 fid = fopen(filename, 'w');
 
 % Escreve o cabeçalho
