@@ -257,7 +257,7 @@ v_sup_adcp = v_sup_adcp - 100;
 u_sup_adcp_comtide = u_sup_adcp;
 v_sup_adcp_comtide = v_sup_adcp;
 
-nome_do_arquivo_outmat = 'nivel_adcp_comtide.mat'; % .mat
+nome_do_arquivo_outmat = 'corr_adcp_comtide.mat'; % .mat
 save (nome_do_arquivo_outmat,'u_sup_adcp_comtide','v_sup_adcp_comtide');
 
 u_sup_adcp=dados(:,8).*sind(dados(:,7));
