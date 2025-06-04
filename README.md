@@ -1,4 +1,4 @@
-# laboceano-bloco1-correntes-marinhas
+# laboceano-bloco2-correntes-marinhas
 Scripts de processamento de dados de correntes marinhas – LabOceano, Bloco 2.
 LabOceano :: Bloco 2 :: Correntes Marinhas Scripts de Processamento LabOceano – Dados de Correntes de ADCP na Baía de Guanabara.
 
