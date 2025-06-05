@@ -504,9 +504,6 @@ end
 
 %% Salva as variáveis
 
-% Formato .mat:
-save ('corr_adcp_suave.mat','corr_adcp_suave');
-
 u_sup_adcp=dados(:,8).*sind(dados(:,7));
 v_sup_adcp=dados(:,8).*cosd(dados(:,7));
 
@@ -519,6 +516,9 @@ dir_sup_adcp_comtide = rad2deg(mod((pi/2 - direcao), 2*pi));
 dados_suavizados = dados(1:tamanho_tempo_total,1:6);
 dados_preenchidos(:,7) = dir_sup_adcp_comtide;
 dados_preenchidos(:,8) = mag_sup_adcp_comtide;
+
+% Formato .mat:
+save ('corr_adcp_suave.mat','u_sup_adcp_comtide','v_sup_adcp_comtide','mag_sup_adcp_comtide',');
 
 % Sem cabeçalho:
 % dlmwrite('nivel_adcp_suave.csv', dados_suavizados, 'delimiter', ',', 'precision', 6);
