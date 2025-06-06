@@ -13,7 +13,8 @@
 % Contribuições de IA:
 % ------------------------------------------------------------
 % Este script foi desenvolvido com o auxílio da inteligência
-% artificial ChatGPT (OpenAI) e Grok (xAI), em maio de 2025.
+% artificial ChatGPT (OpenAI) e Grok (xAI), em maio de 2025,
+% e Gemini (Gooogle AI) em junho de 2025. 
 % A lógica foi construída a partir de instruções e ajustes
 % fornecidos pela pesquisadora, garantindo coerência com os
 % objetivos e critérios do estudo.
@@ -55,11 +56,21 @@ clc
 %% Abertura e Organização dos dados
 
 % === CONFIGURAÇÃO DO USUÁRIO ===
-% Defina aqui o caminho para o diretório onde estão os dados
-data_dir = 'C:/Users/SEU_NOME/SEUS_DADOS/';
+% Defina aqui o nome do arquivo onde estão os dados originais, que
+% ainda contém falhas amostrais, para serem preenchidos:
+nomedoarquivo = 'Estacao_Guanabara_BH_Boia_07_corr_sup.txt'; % .mat, .txt, etc
+
+% Obtendo o caminho completo do script atual:
+current_script_path = mfilename('fullpath');
+
+% Extraindo apenas o diretório onde o script está localizado:
+[script_dir, ~, ~] = fileparts(current_script_path);
+
+% Definindo o diretório de dados em relação à pasta do script:
+% Dados na subpasta 'Dados', dentro da pasta do script:
+data_dir = fullfile(script_dir, 'Dados');
 
 % Define o nome do arquivo de dados:
-nomedoarquivo = 'nomedoarquivo.mat'; % .mat, .txt, etc
 arquivo = fullfile(data_dir, nomedoarquivo);
 
 % Verifica se o arquivo existe antes de carregar
