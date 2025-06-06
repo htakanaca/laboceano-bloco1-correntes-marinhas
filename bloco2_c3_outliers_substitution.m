@@ -111,7 +111,7 @@ end
 data_dir_b1n2 = 'C:/Users/SEU_NOME/SEUS_DADOS/';
 
 % Carrega a série:
-arquivo_b1n2 = fullfile(data_dir_b1n2, 'corr_adcp_suave.mat');
+arquivo_b1n2 = fullfile(data_dir_b1n2, 'corr_sup_adcp_comtide_posblending.mat');
 
 % Verifica se o arquivo existe antes de carregar
 if exist(arquivo_b1n2, 'file') ~= 2
