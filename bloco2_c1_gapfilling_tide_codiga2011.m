@@ -56,10 +56,10 @@ clc
 
 % === CONFIGURAÇÃO DO USUÁRIO ===
 % Defina aqui o caminho para o diretório onde estão os dados
-data_dir = 'D:\Hatsue\Dados_sismo\Estacao_Guanabara_BH_Boia_07\Dados_brutos_do_site\';%'C:/Users/SEU_NOME/SEUS_DADOS/';
+data_dir = 'C:/Users/SEU_NOME/SEUS_DADOS/';
 
 % Define o nome do arquivo de dados:
-nomedoarquivo = 'Estacao_Guanabara_BH_Boia_07_corr_6_5m.TXT';%'nomedoarquivo.mat'; % .mat, .txt, etc
+nomedoarquivo = 'nomedoarquivo.mat'; % .mat, .txt, etc
 arquivo = fullfile(data_dir, nomedoarquivo);
 
 % Verifica se o arquivo existe antes de carregar
