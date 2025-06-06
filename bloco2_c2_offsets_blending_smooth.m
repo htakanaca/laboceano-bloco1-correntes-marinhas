@@ -176,13 +176,13 @@ duracao_nan_index_global=fim_nan_index_global-ini_nan_index_global;
 
 % Extrai a série de componente meridional de velocidade V para uma variável 
 % direta:
-u_sup_adcp=dados(:,8).*sind(dados(:,7));
-v_sup_adcp=dados(:,8).*cosd(dados(:,7));
+u_adcp=dados(:,8).*sind(dados(:,7));
+v_adcp=dados(:,8).*cosd(dados(:,7));
 
 % Guarda uma cópia da previsão harmônica original para posterior 
 % comparação com a versão suavizada:
-u_sup_adcp_comtide_raw = u_sup_adcp_comtide; % salva versão sem blending
-v_sup_adcp_comtide_raw = v_sup_adcp_comtide; % salva versão sem blending
+u_adcp_comtide_raw = u_adcp_comtide; % salva versão sem blending
+v_adcp_comtide_raw = v_adcp_comtide; % salva versão sem blending
 
 %% Blending nas bordas das lacunas que foram preenchidas com previsão de maré
 %
@@ -211,24 +211,24 @@ for ii=2:length(duracao_nan_index_global)
     if(duracao_nan_index_global(ii)<=6)
         
         % Verifica se sobrou NaN no bloco original de falha amostral:
-        yy = length(find(isnan(u_sup_adcp_comtide(ini_nan_index_global(ii):fim_nan_index_global(ii)))==1));
+        yy = length(find(isnan(u_adcp_comtide(ini_nan_index_global(ii):fim_nan_index_global(ii)))==1));
         
         % Caso haja algum NaN, sera iniciada a interpolação linear:
         if yy >= 1
             
             % Interpolação linear:
-            u_sup_adcp_comtide(ini_nan_index_global(ii):fim_nan_index_global(ii)) = 0;
+            u_adcp_comtide(ini_nan_index_global(ii):fim_nan_index_global(ii)) = 0;
 
-            pedaco = (u_sup_adcp_comtide(fim_nan_index_global(ii)+1) - u_sup_adcp_comtide(ini_nan_index_global(ii)-1)) /...
+            pedaco = (u_adcp_comtide(fim_nan_index_global(ii)+1) - u_adcp_comtide(ini_nan_index_global(ii)-1)) /...
                 (duracao_nan_index_global(ii) + 2 );
 
             contap = 0;
 
             for jj=1:duracao_nan_index_global(ii)+1
 
-                u_sup_adcp_comtide(ini_nan_index_global(ii)+contap) = u_sup_adcp_comtide(ini_nan_index_global(ii) -1 + contap) + pedaco;
+                u_adcp_comtide(ini_nan_index_global(ii)+contap) = u_adcp_comtide(ini_nan_index_global(ii) -1 + contap) + pedaco;
 
-                fprintf('NaN corrigido: %.2f em %d\n', u_sup_adcp_comtide(ini_nan_index_global(ii)+contap), ini_nan_index_global(ii)+contap);                
+                fprintf('NaN corrigido: %.2f em %d\n', u_adcp_comtide(ini_nan_index_global(ii)+contap), ini_nan_index_global(ii)+contap);                
 
                 contap=contap+1;
                 
@@ -250,42 +250,42 @@ for ii=2:length(duracao_nan_index_global)
         
         % Blending na borda inicial (antes da lacuna de falha amostral)
         if idx_ini - n_blend >= 1
-            borda_obs = u_sup_adcp_comtide(idx_ini - n_blend : idx_ini - 1);
-            borda_pred = u_sup_adcp_comtide(idx_ini : idx_ini + n_blend - 1);
+            borda_obs = u_adcp_comtide(idx_ini - n_blend : idx_ini - 1);
+            borda_pred = u_adcp_comtide(idx_ini : idx_ini + n_blend - 1);
             for jj = 1:n_blend
                 % Define um fator-rampa (w) para aplicar o blending ao 
                 % longo dos pontos definidos anteriormente por n_blend:
                 w = jj / (n_blend + 1);
-                u_sup_adcp_comtide(idx_ini - 1 + jj) = (1 - w) * borda_obs(jj) + w * borda_pred(jj);
+                u_adcp_comtide(idx_ini - 1 + jj) = (1 - w) * borda_obs(jj) + w * borda_pred(jj);
             end
         end
         
         % Blending na borda final (após a lacuna de falha amostral)
         if(duracao_nan_index_global(ii)>=1)
-            if idx_fim + n_blend <= length(u_sup_adcp_comtide)
-                borda_pred = u_sup_adcp_comtide(idx_fim - n_blend + 1 : idx_fim);
+            if idx_fim + n_blend <= length(u_adcp_comtide)
+                borda_pred = u_adcp_comtide(idx_fim - n_blend + 1 : idx_fim);
                 
-                xx = find(isnan(u_sup_adcp_comtide(idx_fim + 1 : idx_fim + n_blend)));
+                xx = find(isnan(u_adcp_comtide(idx_fim + 1 : idx_fim + n_blend)));
                 if xx > 0
-                    u_sup_adcp_comtide(idx_fim + xx) = 0;
+                    u_adcp_comtide(idx_fim + xx) = 0;
                     % Registra que zerou o valor para ser avaliado
                     % posteriormente:
                     zerou = 1;
                 end
                 
-                borda_obs = u_sup_adcp_comtide(idx_fim + 1 : idx_fim + n_blend);
+                borda_obs = u_adcp_comtide(idx_fim + 1 : idx_fim + n_blend);
                 for jj = 1:n_blend
                     % Define um fator-rampa (w) para aplicar o blending ao 
                     % longo dos pontos definidos anteriormente por n_blend:
                     w = jj / (n_blend + 1);
-                    u_sup_adcp_comtide(idx_fim - n_blend + jj) = (1 - w) * borda_pred(jj) + w * borda_obs(jj);
+                    u_adcp_comtide(idx_fim - n_blend + jj) = (1 - w) * borda_pred(jj) + w * borda_obs(jj);
                 end
             end
         end
         % Se houve valor zerado durante o Blending, ele é marcado com NaN
         % para posterior avaliação:
         if zerou == 1
-            u_sup_adcp_comtide(idx_fim + xx) = NaN;
+            u_adcp_comtide(idx_fim + xx) = NaN;
         end
     end
 end
@@ -311,24 +311,24 @@ for ii=2:length(duracao_nan_index_global)
     if(duracao_nan_index_global(ii)<=6)
         
         % Verifica se sobrou NaN no bloco original de falha amostral:
-        yy = length(find(isnan(v_sup_adcp_comtide(ini_nan_index_global(ii):fim_nan_index_global(ii)))==1));
+        yy = length(find(isnan(v_adcp_comtide(ini_nan_index_global(ii):fim_nan_index_global(ii)))==1));
         
         % Caso haja algum NaN, sera iniciada a interpolação linear:
         if yy >= 1
             
             % Interpolação linear:
-            v_sup_adcp_comtide(ini_nan_index_global(ii):fim_nan_index_global(ii)) = 0;
+            v_adcp_comtide(ini_nan_index_global(ii):fim_nan_index_global(ii)) = 0;
 
-            pedaco = (v_sup_adcp_comtide(fim_nan_index_global(ii)+1) - v_sup_adcp_comtide(ini_nan_index_global(ii)-1)) /...
+            pedaco = (v_adcp_comtide(fim_nan_index_global(ii)+1) - v_adcp_comtide(ini_nan_index_global(ii)-1)) /...
                 (duracao_nan_index_global(ii) + 2 );
 
             contap = 0;
 
             for jj=1:duracao_nan_index_global(ii)+1
 
-                v_sup_adcp_comtide(ini_nan_index_global(ii)+contap) = v_sup_adcp_comtide(ini_nan_index_global(ii) -1 + contap) + pedaco;
+                v_adcp_comtide(ini_nan_index_global(ii)+contap) = v_adcp_comtide(ini_nan_index_global(ii) -1 + contap) + pedaco;
 
-                fprintf('NaN corrigido: %.2f em %d\n', v_sup_adcp_comtide(ini_nan_index_global(ii)+contap), ini_nan_index_global(ii)+contap);                
+                fprintf('NaN corrigido: %.2f em %d\n', v_adcp_comtide(ini_nan_index_global(ii)+contap), ini_nan_index_global(ii)+contap);                
                 
                 contap=contap+1;
                 
@@ -350,42 +350,42 @@ for ii=2:length(duracao_nan_index_global)
         
         % Blending na borda inicial (antes da lacuna de falha amostral)
         if idx_ini - n_blend >= 1
-            borda_obs = v_sup_adcp_comtide(idx_ini - n_blend : idx_ini - 1);
-            borda_pred = v_sup_adcp_comtide(idx_ini : idx_ini + n_blend - 1);
+            borda_obs = v_adcp_comtide(idx_ini - n_blend : idx_ini - 1);
+            borda_pred = v_adcp_comtide(idx_ini : idx_ini + n_blend - 1);
             for jj = 1:n_blend
                 % Define um fator-rampa (w) para aplicar o blending ao 
                 % longo dos pontos definidos anteriormente por n_blend:
                 w = jj / (n_blend + 1);
-                v_sup_adcp_comtide(idx_ini - 1 + jj) = (1 - w) * borda_obs(jj) + w * borda_pred(jj);
+                v_adcp_comtide(idx_ini - 1 + jj) = (1 - w) * borda_obs(jj) + w * borda_pred(jj);
             end
         end
         
         % Blending na borda final (após a lacuna de falha amostral)
         if(duracao_nan_index_global(ii)>=1)
-            if idx_fim + n_blend <= length(v_sup_adcp_comtide)
-                borda_pred = v_sup_adcp_comtide(idx_fim - n_blend + 1 : idx_fim);
+            if idx_fim + n_blend <= length(v_adcp_comtide)
+                borda_pred = v_adcp_comtide(idx_fim - n_blend + 1 : idx_fim);
                 
-                xx = find(isnan(v_sup_adcp_comtide(idx_fim + 1 : idx_fim + n_blend)));
+                xx = find(isnan(v_adcp_comtide(idx_fim + 1 : idx_fim + n_blend)));
                 if xx > 0
-                    v_sup_adcp_comtide(idx_fim + xx) = 0;
+                    v_adcp_comtide(idx_fim + xx) = 0;
                     % Registra que zerou o valor para ser avaliado
                     % posteriormente:
                     zerou = 1;
                 end
                 
-                borda_obs = v_sup_adcp_comtide(idx_fim + 1 : idx_fim + n_blend);
+                borda_obs = v_adcp_comtide(idx_fim + 1 : idx_fim + n_blend);
                 for jj = 1:n_blend
                     % Define um fator-rampa (w) para aplicar o blending ao 
                     % longo dos pontos definidos anteriormente por n_blend:
                     w = jj / (n_blend + 1);
-                    v_sup_adcp_comtide(idx_fim - n_blend + jj) = (1 - w) * borda_pred(jj) + w * borda_obs(jj);
+                    v_adcp_comtide(idx_fim - n_blend + jj) = (1 - w) * borda_pred(jj) + w * borda_obs(jj);
                 end
             end
         end
         % Se houve valor zerado durante o Blending, ele é marcado com NaN
         % para posterior avaliação:
         if zerou == 1
-            v_sup_adcp_comtide(idx_fim + xx) = NaN;
+            v_adcp_comtide(idx_fim + xx) = NaN;
         end
     end
 end
@@ -400,7 +400,7 @@ end
 win_movmean = 3;
 
 % Cópia da série após blending:
-u_sup_adcp_suave = u_sup_adcp_comtide;  
+u_adcp_suave = u_adcp_comtide;  
 
 for ii = 2:length(duracao_nan_index_global)
     
@@ -409,7 +409,7 @@ for ii = 2:length(duracao_nan_index_global)
     idx_fim = fim_nan_index_global(ii);
     
     % Suavização borda inicial:
-    trecho_ini = u_sup_adcp_suave(idx_ini : idx_ini + win_movmean - 1);
+    trecho_ini = u_adcp_suave(idx_ini : idx_ini + win_movmean - 1);
     % Define o filtro de suavização, baseado em dois coeficientes:
     % Termos com b_coef (numerador): Estes são os termos que consideram a 
     % influência direta da entrada no resultado atual. São os termos que 
@@ -424,11 +424,11 @@ for ii = 2:length(duracao_nan_index_global)
     a_coef = 1;
     media_ini = filter(b_coef, a_coef, trecho_ini);
     % Corrige o atraso do filtro causal
-    u_sup_adcp_suave(idx_ini : idx_ini + win_movmean - 1) = ...
+    u_adcp_suave(idx_ini : idx_ini + win_movmean - 1) = ...
         [trecho_ini(1:win_movmean-1); media_ini(win_movmean:end)];
     
     % Suavização borda final:
-    trecho_fim = u_sup_adcp_suave(idx_fim - win_movmean + 1 : idx_fim);
+    trecho_fim = u_adcp_suave(idx_fim - win_movmean + 1 : idx_fim);
     % Define o filtro de suavização, baseado em dois coeficientes:
     % Termos com b_coef (numerador): Estes são os termos que consideram a 
     % influência direta da entrada no resultado atual. São os termos que 
@@ -442,7 +442,7 @@ for ii = 2:length(duracao_nan_index_global)
     % impulso finita (FIR), o que é um caso mais simples.
     a_coef = 1;    
     media_fim = filter(b_coef, a_coef, trecho_fim);
-    u_sup_adcp_suave(idx_fim - win_movmean + 1 : idx_fim) = ...
+    u_adcp_suave(idx_fim - win_movmean + 1 : idx_fim) = ...
         [trecho_fim(1:win_movmean-1); media_fim(win_movmean:end)];
 end
 
@@ -455,7 +455,7 @@ end
 win_movmean = 3;
 
 % Cópia da série após blending:
-v_sup_adcp_suave = v_sup_adcp_comtide;  
+v_adcp_suave = v_adcp_comtide;  
 
 for ii = 2:length(duracao_nan_index_global)
     
@@ -464,7 +464,7 @@ for ii = 2:length(duracao_nan_index_global)
     idx_fim = fim_nan_index_global(ii);
     
     % Suavização borda inicial:
-    trecho_ini = v_sup_adcp_suave(idx_ini : idx_ini + win_movmean - 1);
+    trecho_ini = v_adcp_suave(idx_ini : idx_ini + win_movmean - 1);
     % Define o filtro de suavização, baseado em dois coeficientes:
     % Termos com b_coef (numerador): Estes são os termos que consideram a 
     % influência direta da entrada no resultado atual. São os termos que 
@@ -479,11 +479,11 @@ for ii = 2:length(duracao_nan_index_global)
     a_coef = 1;
     media_ini = filter(b_coef, a_coef, trecho_ini);
     % Corrige o atraso do filtro causal
-    v_sup_adcp_suave(idx_ini : idx_ini + win_movmean - 1) = ...
+    v_adcp_suave(idx_ini : idx_ini + win_movmean - 1) = ...
         [trecho_ini(1:win_movmean-1); media_ini(win_movmean:end)];
     
     % Suavização borda final:
-    trecho_fim = v_sup_adcp_suave(idx_fim - win_movmean + 1 : idx_fim);
+    trecho_fim = v_adcp_suave(idx_fim - win_movmean + 1 : idx_fim);
     % Define o filtro de suavização, baseado em dois coeficientes:
     % Termos com b_coef (numerador): Estes são os termos que consideram a 
     % influência direta da entrada no resultado atual. São os termos que 
@@ -497,28 +497,28 @@ for ii = 2:length(duracao_nan_index_global)
     % impulso finita (FIR), o que é um caso mais simples.
     a_coef = 1;    
     media_fim = filter(b_coef, a_coef, trecho_fim);
-    v_sup_adcp_suave(idx_fim - win_movmean + 1 : idx_fim) = ...
+    v_adcp_suave(idx_fim - win_movmean + 1 : idx_fim) = ...
         [trecho_fim(1:win_movmean-1); media_fim(win_movmean:end)];
 end
 
 
 %% Salva as variáveis
 
-u_sup_adcp=dados(:,8).*sind(dados(:,7));
-v_sup_adcp=dados(:,8).*cosd(dados(:,7));
+u_adcp=dados(:,8).*sind(dados(:,7));
+v_adcp=dados(:,8).*cosd(dados(:,7));
 
-mag_sup_adcp_comtide= sqrt((u_sup_adcp_comtide.^2)+(v_sup_adcp_comtide.^2));
+mag_adcp_comtide= sqrt((u_adcp_comtide.^2)+(v_adcp_comtide.^2));
 
-direcao = atan2(v_sup_adcp_comtide,u_sup_adcp_comtide);
-dir_sup_adcp_comtide = rad2deg(mod((pi/2 - direcao), 2*pi));
+direcao = atan2(v_adcp_comtide,u_adcp_comtide);
+dir_adcp_comtide = rad2deg(mod((pi/2 - direcao), 2*pi));
 
 % Formato .csv:
 dados_suavizados = dados(1:tamanho_tempo_total,1:6);
-dados_preenchidos(:,7) = dir_sup_adcp_comtide;
-dados_preenchidos(:,8) = mag_sup_adcp_comtide;
+dados_preenchidos(:,7) = dir_adcp_comtide;
+dados_preenchidos(:,8) = mag_adcp_comtide;
 
 % Formato .mat:
-save ('corr_adcp_suave.mat','u_sup_adcp_comtide','v_sup_adcp_comtide','mag_sup_adcp_comtide',');
+save ('corr_adcp_suave.mat','u_adcp_comtide','v_adcp_comtide','mag_adcp_comtide',');
 
 % Sem cabeçalho:
 % dlmwrite('nivel_adcp_suave.csv', dados_suavizados, 'delimiter', ',', 'precision', 6);
@@ -540,10 +540,10 @@ end
 fclose(fid);
 
 % Se quiser salvar:
-% print('u_sup_mar_blending_zoom','-dpng','-r300')
+% print('u_mar_blending_zoom','-dpng','-r300')
 
-nome_arquivo_out = 'corr_sup_adcp_comtide_posblending.mat';
-save(nome_arquivo_out,'u_sup_adcp_comtide','v_sup_adcp_comtide','dados_suavizados');
+nome_arquivo_out = 'corr_adcp_comtide_posblending.mat';
+save(nome_arquivo_out,'u_adcp_comtide','v_adcp_comtide','dados_suavizados');
 
 %% Plotagem para inspeção visual
 %
@@ -553,16 +553,16 @@ clf
 hold on
 
 % Sinal original (com NaNs)
-plot(u_sup_adcp, 'k', 'DisplayName', 'Série original')
+plot(u_adcp, 'k', 'DisplayName', 'Série original')
 
 % Previsão harmônica antes do blending
-plot(u_sup_adcp_comtide_raw, 'b', 'DisplayName', 'Previsão harmônica (raw)')
+plot(u_adcp_comtide_raw, 'b', 'DisplayName', 'Previsão harmônica (raw)')
 
 % Previsão harmônica suavizada (com blending)
-plot(u_sup_adcp_comtide, 'm', 'LineWidth', 1.2, 'DisplayName', 'Previsão com blending')
+plot(u_adcp_comtide, 'm', 'LineWidth', 1.2, 'DisplayName', 'Previsão com blending')
 
 % Previsão harmônica pós-suavização com blending:
-plot(u_sup_adcp_suave, 'c', 'LineWidth', 1.2, 'DisplayName', 'Previsão com blending e pós-suavização')
+plot(u_adcp_suave, 'c', 'LineWidth', 1.2, 'DisplayName', 'Previsão com blending e pós-suavização')
 
 % Legenda e título
 legend('Location', 'best')
@@ -586,16 +586,16 @@ clf
 hold on
 
 % Sinal original (com NaNs)
-plot(v_sup_adcp, 'k', 'DisplayName', 'Série original')
+plot(v_adcp, 'k', 'DisplayName', 'Série original')
 
 % Previsão harmônica antes do blending
-plot(v_sup_adcp_comtide_raw, 'b', 'DisplayName', 'Previsão harmônica (raw)')
+plot(v_adcp_comtide_raw, 'b', 'DisplayName', 'Previsão harmônica (raw)')
 
 % Previsão harmônica suavizada (com blending)
-plot(v_sup_adcp_comtide, 'm', 'LineWidth', 1.2, 'DisplayName', 'Previsão com blending')
+plot(v_adcp_comtide, 'm', 'LineWidth', 1.2, 'DisplayName', 'Previsão com blending')
 
 % Previsão harmônica pós-suavização com blending:
-plot(v_sup_adcp_suave, 'c', 'LineWidth', 1.2, 'DisplayName', 'Previsão com blending e pós-suavização')
+plot(v_adcp_suave, 'c', 'LineWidth', 1.2, 'DisplayName', 'Previsão com blending e pós-suavização')
 
 % Legenda e título
 legend('Location', 'best')
