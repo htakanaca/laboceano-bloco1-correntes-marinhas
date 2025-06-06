@@ -57,13 +57,27 @@ clc
 %% Abertura e Organização dos dados
 
 % === CONFIGURAÇÃO DO USUÁRIO ===
-% Defina aqui o caminho para o diretório onde estão os dados originais, que
-% ainda contém falhas amostrais, para fins de comparação posterior:
-data_dir = 'C:/Users/SEU_NOME/SEUS_DADOS/';
+% Defina aqui o nome do arquivo onde estão os dados originais, que
+% ainda contém falhas amostrais, para serem preenchidos:
+nomedoarquivo = 'Estacao_Guanabara_BH_Boia_07_corr_sup.txt'; % .mat, .txt, etc
+% Nome da série de previsão harmônica previamente ajustada com o U-Tide 
+% (salva pelo script "bloco1_c1_gapfilling_tide_codiga2011.m"):
+arquivo_b1n1 = fullfile(data_dir_b1n1, 'corr_adcp_comtide.mat');
+
+
+
+% Obtendo o caminho completo do script atual:
+current_script_path = mfilename('fullpath');
+
+% Extraindo apenas o diretório onde o script está localizado:
+[script_dir, ~, ~] = fileparts(current_script_path);
+
+% Definindo o diretório de dados em relação à pasta do script:
+% Dados na subpasta 'Dados', dentro da pasta do script:
+data_dir = fullfile(script_dir, 'Dados');
 
 % Define o nome do arquivo de dados:
-nome_arquivo = 'nomedoarquivo.mat'; % .mat, .txt, etc
-arquivo = fullfile(data_dir, nome_arquivo);
+arquivo = fullfile(data_dir, nomedoarquivo);
 
 % Verifica se o arquivo existe antes de carregar
 if exist(arquivo, 'file') ~= 2
@@ -111,9 +125,6 @@ end
 % (salva pelo script "bloco1_c1_gapfilling_tide_codiga2011.m")
 data_dir_b1n1 = 'C:/Users/SEU_NOME/SEUS_DADOS/';
 
-% Carrega a série de previsão harmônica previamente ajustada com o U-Tide 
-% (salva pelo script "bloco1_c1_gapfilling_tide_codiga2011.m"):
-arquivo_b1n1 = fullfile(data_dir_b1n1, 'corr_adcp_comtide.mat');
 
 % Verifica se o arquivo existe antes de carregar
 if exist(arquivo_b1n1, 'file') ~= 2
