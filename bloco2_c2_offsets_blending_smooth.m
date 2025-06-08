@@ -529,7 +529,7 @@ dados_preenchidos(:,7) = dir_adcp_comtide;
 dados_preenchidos(:,8) = mag_adcp_comtide;
 
 % Formato .mat:
-save ('corr_adcp_suave.mat','u_adcp_comtide','v_adcp_comtide','mag_adcp_comtide',');
+save ('corr_adcp_suave.mat','u_adcp_comtide','v_adcp_comtide','mag_adcp_comtide');
 
 % Sem cabeçalho:
 % dlmwrite('nivel_adcp_suave.csv', dados_suavizados, 'delimiter', ',', 'precision', 6);
